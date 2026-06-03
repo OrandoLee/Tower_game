@@ -10,7 +10,11 @@ export function GameHeader({ state }: GameHeaderProps) {
 
   return (
     <header className="game-header panel">
-      <div>
+      <div className="mobile-status-strip" aria-label="移动端状态栏">
+        第 {state.floor} 层｜回合 {state.turn + 1}｜金币 {state.player.gold}｜牌组 {state.player.deck.length}
+      </div>
+
+      <div className="game-header-copy">
         <p className="kicker">独立前端小游戏</p>
         <h1>数值高塔</h1>
         <p className="subtitle">一个由纯粹数值构成的极简爬塔实验。</p>

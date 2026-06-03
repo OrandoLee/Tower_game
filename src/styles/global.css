@@ -54,6 +54,59 @@ button:focus-visible {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
 }
 
+.target-zone {
+  position: relative;
+  min-height: 172px;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease,
+    transform 150ms ease;
+}
+
+.target-zone-armed {
+  cursor: pointer;
+}
+
+.target-zone-armed.target-zone-idle {
+  opacity: 0.78;
+}
+
+.target-zone-valid {
+  border-color: #91abc9;
+  background:
+    linear-gradient(180deg, rgba(145, 171, 201, 0.08), transparent 58%),
+    rgba(14, 21, 29, 0.97);
+  box-shadow:
+    0 0 0 1px rgba(145, 171, 201, 0.22),
+    0 0 20px rgba(104, 136, 172, 0.18),
+    0 14px 34px rgba(0, 0, 0, 0.28);
+}
+
+.target-zone-invalid {
+  border-color: #81505a;
+  background:
+    linear-gradient(180deg, rgba(129, 80, 90, 0.08), transparent 58%),
+    rgba(14, 17, 23, 0.96);
+  animation: target-reject 160ms ease;
+}
+
+@keyframes target-reject {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  45% {
+    transform: translateX(-3px);
+  }
+
+  75% {
+    transform: translateX(3px);
+  }
+}
+
 .game-header {
   display: grid;
   gap: 18px;
@@ -127,23 +180,32 @@ h1 {
   margin-top: 12px;
 }
 
+.combat-area {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
 .enemy-area,
 .player-area,
 .action-area,
 .reward-area,
 .result-area,
-.log-area,
-.relic-area {
+.turn-action-area,
+.info-area {
   min-width: 0;
-}
-
-.relic-area {
-  display: grid;
-  gap: 12px;
 }
 
 .panel:not(.game-header) {
   padding: 14px;
+}
+
+.embedded-panel {
+  min-width: 0;
+}
+
+.mobile-status-strip {
+  display: none;
 }
 
 .panel-title {
@@ -215,6 +277,10 @@ meter::-moz-meter-bar {
 
 .stat-grid.compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.player-quick-status {
+  display: none;
 }
 
 .stat-item {
@@ -325,6 +391,36 @@ meter::-moz-meter-bar {
   color: #edf4fb;
 }
 
+.turn-action-bar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.turn-action-bar button {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid #344254;
+  border-radius: 6px;
+  background: #141b24;
+  color: #edf4fb;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    opacity 140ms ease;
+}
+
+.turn-action-bar button:hover:not(:disabled) {
+  border-color: #7f98b8;
+  background: #182331;
+}
+
+.turn-action-bar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .hand-stage {
   min-width: 0;
   overflow: visible;
@@ -386,9 +482,31 @@ meter::-moz-meter-bar {
   transform: translateY(-14px) rotate(calc(var(--card-offset) * 1.5deg));
 }
 
+.action-card-selected {
+  z-index: 42;
+  border-color: #a9bad0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(169, 186, 208, 0.24),
+    0 22px 38px rgba(0, 0, 0, 0.38);
+  transform: translateY(-20px) rotate(calc(var(--card-offset) * 1deg));
+}
+
+.action-card-dimmed {
+  opacity: 0.58;
+}
+
 .action-card:active:not(:disabled),
 .action-card-played {
   transform: translateY(-8px) scale(0.985) rotate(calc(var(--card-offset) * 1.5deg));
+}
+
+.action-card-played {
+  border-color: #c1cbd8;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 16px rgba(166, 184, 207, 0.22),
+    0 16px 30px rgba(0, 0, 0, 0.32);
 }
 
 .action-card:disabled {
@@ -541,6 +659,37 @@ meter::-moz-meter-bar {
 
 .battle-log li:nth-last-child(n + 7) {
   display: none;
+}
+
+.mobile-info-tabs {
+  display: grid;
+  gap: 10px;
+}
+
+.info-tab-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.info-tab-list button {
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid #2b3543;
+  border-radius: 6px;
+  background: #0b1017;
+  color: #aeb9c6;
+  cursor: pointer;
+}
+
+.info-tab-list .info-tab-active {
+  border-color: #7f98b8;
+  background: #162232;
+  color: #edf4fb;
+}
+
+.info-tab-panel {
+  min-width: 0;
 }
 
 .relic-list {
@@ -720,15 +869,301 @@ meter::-moz-meter-bar {
   line-height: 1.45;
 }
 
+@media (max-width: 767px) {
+  .app-shell {
+    padding: 8px;
+  }
+
+  .game-header {
+    padding: 10px 12px;
+  }
+
+  .game-header-copy,
+  .game-header .progress-strip {
+    display: none;
+  }
+
+  .mobile-status-strip {
+    display: block;
+    color: #edf4fb;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .game-layout {
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .combat-area {
+    gap: 6px;
+  }
+
+  .panel:not(.game-header) {
+    padding: 10px;
+  }
+
+  .target-zone {
+    min-height: 0;
+  }
+
+  .enemy-panel {
+    display: grid;
+    gap: 8px;
+  }
+
+  .enemy-panel .panel-title,
+  .player-area .panel-title {
+    margin-bottom: 0;
+  }
+
+  .enemy-name,
+  .hp-block,
+  .intent-box {
+    margin: 0;
+  }
+
+  .enemy-name {
+    padding: 8px;
+  }
+
+  .enemy-panel .stat-grid.compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .enemy-panel .stat-item {
+    min-height: 40px;
+    padding: 7px 8px;
+  }
+
+  .intent-box {
+    padding: 8px;
+  }
+
+  .action-hand {
+    position: static;
+    overflow: hidden;
+  }
+
+  .action-hand-header {
+    margin-bottom: 6px;
+  }
+
+  .action-hand-header p {
+    font-size: 0.95rem;
+  }
+
+  .hand-stage {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 8px 0 2px;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
+  }
+
+  .hand-card-row {
+    justify-content: flex-start;
+    min-width: max-content;
+    min-height: 168px;
+    overflow: visible;
+    gap: 8px;
+    padding: 6px 2px 8px;
+  }
+
+  .action-card {
+    width: clamp(108px, 31vw, 132px);
+    min-height: 150px;
+    height: 158px;
+    margin-left: 0;
+    gap: 6px;
+    padding: 10px;
+    transform: none;
+  }
+
+  .action-card:hover:not(:disabled),
+  .action-card:focus-visible:not(:disabled) {
+    transform: translateY(-4px);
+  }
+
+  .action-card-selected {
+    border-color: #b9c9dc;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 0 2px rgba(185, 201, 220, 0.28),
+      0 12px 24px rgba(0, 0, 0, 0.34);
+    transform: translateY(-6px);
+  }
+
+  .action-card:active:not(:disabled),
+  .action-card-played {
+    transform: translateY(-3px) scale(0.985);
+  }
+
+  .action-card-cost {
+    width: 26px;
+    height: 26px;
+    font-size: 0.84rem;
+  }
+
+  .action-card-type {
+    padding: 3px 6px;
+    font-size: 0.68rem;
+  }
+
+  .action-card strong {
+    font-size: 1.02rem;
+  }
+
+  .action-card small {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.76rem;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .action-card em {
+    font-size: 0.68rem;
+    padding-top: 6px;
+  }
+
+  .player-area .panel {
+    min-height: 76px;
+    padding-block: 9px;
+  }
+
+  .player-quick-status {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(58px, 0.7fr));
+    gap: 6px;
+  }
+
+  .player-quick-status div {
+    min-width: 0;
+    padding: 7px 8px;
+    border: 1px solid #212a35;
+    border-radius: 6px;
+    background: #0b1017;
+  }
+
+  .player-quick-status span {
+    display: block;
+    color: #8f9aaa;
+    font-size: 0.7rem;
+    line-height: 1.25;
+  }
+
+  .player-quick-status strong {
+    display: block;
+    margin-top: 2px;
+    color: #edf4fb;
+    font-size: 0.86rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .player-quick-status .quick-deck-state {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 30px;
+    padding-block: 5px;
+  }
+
+  .quick-deck-state strong {
+    margin-top: 0;
+    text-align: right;
+  }
+
+  .player-full-stats {
+    display: none;
+  }
+
+  .turn-action-bar {
+    padding: 8px;
+  }
+
+  .turn-action-bar button {
+    min-height: 40px;
+  }
+
+  .mobile-info-tabs {
+    padding: 8px;
+  }
+
+  .info-tab-panel {
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  .mobile-info-tabs .panel-title {
+    margin-bottom: 8px;
+  }
+
+  .battle-log {
+    gap: 6px;
+    font-size: 0.78rem;
+  }
+
+  .battle-log li {
+    padding: 7px 8px;
+  }
+
+  .battle-log li:nth-last-child(n + 6) {
+    display: none;
+  }
+
+  .deck-list,
+  .relic-list {
+    gap: 6px;
+  }
+
+  .deck-card,
+  .relic-item {
+    padding: 8px;
+  }
+
+  .reward-panel {
+    margin-top: 0;
+  }
+
+  .reward-grid {
+    gap: 7px;
+  }
+
+  .reward-card {
+    min-height: 92px;
+    padding: 10px;
+  }
+
+  .reward-card small {
+    line-height: 1.4;
+  }
+}
+
 @media (min-width: 768px) {
   .app-shell {
     padding: 22px;
+  }
+
+  .mobile-status-strip {
+    display: none;
   }
 
   .game-header {
     grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
     align-items: start;
     padding: 22px;
+  }
+
+  .game-header-copy {
+    display: block;
   }
 
   h1 {
@@ -742,11 +1177,15 @@ meter::-moz-meter-bar {
   .game-layout {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     grid-template-areas:
-      "enemy enemy"
-      "player action"
-      "reward reward"
+      "combat combat"
+      "player actionbar"
       "result result"
-      "log relic";
+      "info info";
+  }
+
+  .action-hand {
+    position: sticky;
+    top: 8px;
   }
 
   .battle-log li:nth-last-child(n + 7) {
@@ -766,14 +1205,13 @@ meter::-moz-meter-bar {
   .game-layout {
     grid-template-columns: minmax(230px, 0.8fr) minmax(360px, 1.2fr) minmax(240px, 0.9fr);
     grid-template-areas:
-      "player enemy log"
-      "relic reward log"
-      "relic result log"
-      "relic action log";
+      "player combat info"
+      "actionbar combat info"
+      "result combat info";
     align-items: start;
   }
 
-  .log-panel {
+  .info-area {
     position: sticky;
     top: 16px;
   }
@@ -784,53 +1222,38 @@ meter::-moz-meter-bar {
 }
 
 @media (min-width: 768px) {
-  .enemy-area {
-    grid-area: enemy;
+  .combat-area {
+    grid-area: combat;
   }
 
   .player-area {
     grid-area: player;
   }
 
-  .action-area {
-    grid-area: action;
-  }
-
-  .reward-area {
-    grid-area: reward;
+  .turn-action-area {
+    grid-area: actionbar;
   }
 
   .result-area {
     grid-area: result;
   }
 
-  .log-area {
-    grid-area: log;
-  }
-
-  .relic-area {
-    grid-area: relic;
+  .info-area {
+    grid-area: info;
   }
 }
 
 @media (max-width: 420px) {
   .app-shell {
+    padding: 8px;
+  }
+
+  .game-header {
     padding: 10px;
   }
 
-  .game-header,
   .panel:not(.game-header) {
-    padding: 12px;
-  }
-
-  h1 {
-    font-size: 1.75rem;
-  }
-
-  .progress-strip,
-  .stat-grid,
-  .result-stats {
-    grid-template-columns: 1fr;
+    padding: 9px;
   }
 
   .result-restart,
@@ -845,19 +1268,28 @@ meter::-moz-meter-bar {
   }
 
   .hand-card-row {
-    min-height: 196px;
-    padding-inline: 10px;
+    min-height: 164px;
+    padding-inline: 1px;
   }
 
   .action-card {
-    width: clamp(132px, 43vw, 150px);
-    min-height: 184px;
-    margin-left: -10px;
-    transform: translateY(0) rotate(calc(var(--card-offset) * 1.25deg));
+    width: clamp(108px, 32vw, 124px);
+    min-height: 148px;
+    height: 156px;
+    margin-left: 0;
+    transform: none;
   }
 
   .action-card:hover:not(:disabled),
   .action-card:focus-visible:not(:disabled) {
-    transform: translateY(-8px) rotate(calc(var(--card-offset) * 0.75deg));
+    transform: translateY(-4px);
+  }
+
+  .action-card-selected {
+    transform: translateY(-6px);
+  }
+
+  .target-zone {
+    min-height: 0;
   }
 }
