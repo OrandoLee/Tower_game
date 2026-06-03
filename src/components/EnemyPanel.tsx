@@ -5,11 +5,34 @@ import { StatItem } from './StatItem';
 
 interface EnemyPanelProps {
   enemy: Enemy;
+  targetState: 'idle' | 'valid' | 'invalid';
+  targetActive: boolean;
+  onTargetClick: () => void;
 }
 
-export function EnemyPanel({ enemy }: EnemyPanelProps) {
+export function EnemyPanel({ enemy, targetState, targetActive, onTargetClick }: EnemyPanelProps) {
   return (
-    <section className="panel enemy-panel">
+    <section
+      className={`panel enemy-panel target-zone target-zone-${targetState}${targetActive ? ' target-zone-armed' : ''}`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onTargetClick();
+      }}
+      role={targetActive ? 'button' : undefined}
+      tabIndex={targetActive ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (!targetActive) {
+          return;
+        }
+
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onTargetClick();
+        }
+      }}
+      aria-label="敌人目标区"
+      data-target-area="enemy"
+    >
       <div className="panel-title">
         <p>敌人面板</p>
         <span>{getEnemyTypeLabel(enemy.type)}</span>

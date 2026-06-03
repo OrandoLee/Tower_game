@@ -4,14 +4,17 @@ import type { CSSProperties } from 'react';
 
 interface ActionHandProps {
   phase: GamePhase;
-  onAttack: () => void;
-  onGuard: () => void;
-  onRestart: () => void;
+  selectedCardId: string | null;
+  playedCardId: string | null;
+  message: string;
+  onSelectCard: (card: ActionCardData) => void;
 }
 
 const actionCards: ActionCardData[] = [
   {
     id: 'attack',
+    actionType: 'attack',
+    targetType: 'enemy',
     title: '攻击',
     typeLabel: '攻击牌',
     description: '对敌人造成一次伤害。',
@@ -21,6 +24,8 @@ const actionCards: ActionCardData[] = [
   },
   {
     id: 'guard',
+    actionType: 'guard',
+    targetType: 'player',
     title: '防御',
     typeLabel: '防御牌',
     description: '获得护甲，抵挡敌人的下一次行动伤害。',
@@ -46,7 +51,7 @@ function phaseLabel(phase: GamePhase): string {
   return '结算中';
 }
 
-export function ActionHand({ phase, onAttack, onGuard, onRestart }: ActionHandProps) {
+export function ActionHand({ phase, selectedCardId, playedCardId, message, onSelectCard }: ActionHandProps) {
   const canAct = phase === 'battle';
 
   return (
@@ -54,11 +59,8 @@ export function ActionHand({ phase, onAttack, onGuard, onRestart }: ActionHandPr
       <div className="action-hand-header">
         <div>
           <p>当前手牌</p>
-          <span>{phaseLabel(phase)}</span>
+          <span>{message || phaseLabel(phase)}</span>
         </div>
-        <button type="button" className="hand-restart-button" onClick={onRestart}>
-          重新开始
-        </button>
       </div>
 
       <div className="hand-stage">
@@ -68,9 +70,12 @@ export function ActionHand({ phase, onAttack, onGuard, onRestart }: ActionHandPr
               key={card.id}
               card={card}
               disabled={!canAct}
+              selected={selectedCardId === card.id}
+              dimmed={selectedCardId !== null && selectedCardId !== card.id}
+              played={playedCardId === card.id}
               index={index}
               total={actionCards.length}
-              onPlay={card.id === 'attack' ? onAttack : onGuard}
+              onSelect={onSelectCard}
             />
           ))}
         </div>

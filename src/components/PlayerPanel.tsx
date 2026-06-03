@@ -5,17 +5,60 @@ import { StatItem } from './StatItem';
 interface PlayerPanelProps {
   player: Player;
   floor: number;
+  turn: number;
+  targetState: 'idle' | 'valid' | 'invalid';
+  targetActive: boolean;
+  onTargetClick: () => void;
 }
 
-export function PlayerPanel({ player, floor }: PlayerPanelProps) {
+export function PlayerPanel({ player, floor, turn, targetState, targetActive, onTargetClick }: PlayerPanelProps) {
   return (
-    <section className="panel">
+    <section
+      className={`panel target-zone target-zone-${targetState}${targetActive ? ' target-zone-armed' : ''}`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onTargetClick();
+      }}
+      role={targetActive ? 'button' : undefined}
+      tabIndex={targetActive ? 0 : undefined}
+      onKeyDown={(event) => {
+        if (!targetActive) {
+          return;
+        }
+
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onTargetClick();
+        }
+      }}
+      aria-label="玩家目标区"
+      data-target-area="player"
+    >
       <div className="panel-title">
         <p>玩家面板</p>
         <span>局内属性</span>
       </div>
 
-      <div className="hp-block">
+      <div className="player-quick-status" aria-label="玩家简要状态">
+        <div className="quick-hp">
+          <span>生命值</span>
+          <strong>{formatHp(player.hp, player.maxHp)}</strong>
+        </div>
+        <div>
+          <span>护甲</span>
+          <strong>{player.block}</strong>
+        </div>
+        <div>
+          <span>能量</span>
+          <strong>1 / 1</strong>
+        </div>
+        <div className="quick-deck-state">
+          <span>牌堆</span>
+          <strong>抽牌 {player.deck.length}｜弃牌 {turn}</strong>
+        </div>
+      </div>
+
+      <div className="hp-block player-full-stats">
         <div>
           <span>生命值</span>
           <strong>{formatHp(player.hp, player.maxHp)}</strong>
@@ -23,7 +66,7 @@ export function PlayerPanel({ player, floor }: PlayerPanelProps) {
         <meter min="0" max={player.maxHp} value={Math.max(0, player.hp)} />
       </div>
 
-      <div className="stat-grid">
+      <div className="stat-grid player-full-stats">
         <StatItem label="攻击" value={player.atk} />
         <StatItem label="防御" value={player.def} />
         <StatItem label="护甲" value={player.block} />
