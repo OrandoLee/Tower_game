@@ -35,6 +35,11 @@ export const RELICS: Relic[] = [
     description: '防御增加 5。',
   },
   {
+    id: 'wall-core',
+    name: '铁壁核心',
+    description: '每场战斗开始时获得 6 点护甲。',
+  },
+  {
     id: 'rage-core',
     name: '狂怒核心',
     description: '生命值低于 30% 时，攻击变为 1.5 倍。',
@@ -47,7 +52,27 @@ export const RELICS: Relic[] = [
   {
     id: 'spike-armor',
     name: '尖刺甲',
-    description: '敌人攻击玩家后，受到玩家防御 * 2 的反伤。',
+    description: '敌人攻击玩家时受到 3 点反伤。若玩家有护甲，反伤提高为 6 点。',
+  },
+  {
+    id: 'guard-module',
+    name: '守卫模块',
+    description: '每回合第一次获得护甲时，额外获得 3 点护甲。',
+  },
+  {
+    id: 'gray-amulet',
+    name: '灰色护符',
+    description: '每回合开始获得 2 点护甲。',
+  },
+  {
+    id: 'stabilizer',
+    name: '稳定器',
+    description: '回合结束时保留 50% 当前护甲到下回合。',
+  },
+  {
+    id: 'reactive-armor',
+    name: '反应装甲',
+    description: '每当护甲完全抵挡一次攻击，抽 1 张攻击牌，并转化为下一次攻击的蓄势伤害。',
   },
   {
     id: 'hunter-eye',
@@ -65,20 +90,26 @@ export const CARD_DEFINITIONS: CardDefinition[] = [
   {
     id: 'strike',
     name: '打击',
+    kind: '攻击牌',
+    cost: 1,
     description: '攻击时伤害增加 2。',
     rarity: '基础',
     attackBonus: 2,
   },
   {
-    id: 'guard-step',
-    name: '守势',
-    description: '防御时额外减少 2 点伤害。',
+    id: 'defend',
+    name: '防御',
+    kind: '防御牌',
+    cost: 1,
+    description: '获得 8 点护甲。',
     rarity: '基础',
-    guardBonus: 2,
+    blockGain: 8,
   },
   {
     id: 'heavy-hit',
     name: '重击',
+    kind: '攻击牌',
+    cost: 1,
     description: '攻击时伤害增加 8。',
     rarity: '普通',
     attackBonus: 8,
@@ -86,6 +117,8 @@ export const CARD_DEFINITIONS: CardDefinition[] = [
   {
     id: 'steady-cut',
     name: '稳定斩击',
+    kind: '攻击牌',
+    cost: 1,
     description: '攻击时暴击率增加 10%。',
     rarity: '普通',
     critRateBonus: 0.1,
@@ -93,21 +126,55 @@ export const CARD_DEFINITIONS: CardDefinition[] = [
   {
     id: 'blood-cut',
     name: '回血刺',
+    kind: '攻击牌',
+    cost: 1,
     description: '攻击时伤害增加 4，临时吸血增加 8%。',
     rarity: '普通',
     attackBonus: 4,
     lifestealBonus: 0.08,
   },
   {
-    id: 'iron-guard',
-    name: '铁壁姿态',
-    description: '防御时额外减少 8 点伤害。',
+    id: 'iron-wall-card',
+    name: '铁壁',
+    kind: '防御牌',
+    cost: 2,
+    description: '获得 16 点护甲。',
     rarity: '普通',
-    guardBonus: 8,
+    blockGain: 16,
+  },
+  {
+    id: 'counter-guard',
+    name: '反制',
+    kind: '防御牌',
+    cost: 1,
+    description: '获得 6 点护甲。如果敌人意图是攻击或强击，额外获得 4 点护甲。',
+    rarity: '普通',
+    blockGain: 6,
+    bonusBlockAgainstAttack: 4,
+  },
+  {
+    id: 'reckoning',
+    name: '清算',
+    kind: '攻击牌',
+    cost: 2,
+    description: '造成等同于当前护甲数值的伤害。',
+    rarity: '普通',
+    damageFromBlock: true,
+  },
+  {
+    id: 'steady',
+    name: '稳固',
+    kind: '技能牌',
+    cost: 1,
+    description: '本回合结束时，保留一半护甲到下回合。',
+    rarity: '普通',
+    retainHalfBlock: true,
   },
   {
     id: 'piercing-hit',
     name: '贯穿重击',
+    kind: '攻击牌',
+    cost: 2,
     description: '攻击时伤害增加 16。',
     rarity: '强力',
     attackBonus: 16,
@@ -115,6 +182,8 @@ export const CARD_DEFINITIONS: CardDefinition[] = [
   {
     id: 'focus-burst',
     name: '集中爆发',
+    kind: '攻击牌',
+    cost: 2,
     description: '攻击时暴击率增加 12%，暴击伤害增加 50%。',
     rarity: '强力',
     critRateBonus: 0.12,
@@ -123,6 +192,8 @@ export const CARD_DEFINITIONS: CardDefinition[] = [
   {
     id: 'blood-edge',
     name: '血刃',
+    kind: '攻击牌',
+    cost: 2,
     description: '攻击时伤害增加 8，临时吸血增加 15%。',
     rarity: '强力',
     attackBonus: 8,
@@ -131,14 +202,16 @@ export const CARD_DEFINITIONS: CardDefinition[] = [
   {
     id: 'alloy-wall',
     name: '合金壁垒',
-    description: '防御时额外减少 14 点伤害，并回复 5 点生命值。',
+    kind: '防御牌',
+    cost: 2,
+    description: '获得 20 点护甲，并回复 5 点生命值。',
     rarity: '强力',
-    guardBonus: 14,
+    blockGain: 20,
     healOnGuard: 5,
   },
 ];
 
-export const STARTER_DECK_IDS = ['strike', 'strike', 'strike', 'guard-step', 'guard-step'];
+export const STARTER_DECK_IDS = ['strike', 'strike', 'strike', 'defend', 'defend'];
 
 export const ENEMY_TYPE_LABELS = {
   normal: '普通',

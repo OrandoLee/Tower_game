@@ -31,6 +31,14 @@ export function EnemyPanel({ enemy }: EnemyPanelProps) {
       <div className="stat-grid compact">
         <StatItem label="类型" value={getEnemyTypeLabel(enemy.type)} />
         <StatItem label="攻击" value={enemy.atk} />
+        <StatItem label="护甲" value={enemy.block} />
+        <StatItem label="意图" value={enemy.intent.label} />
+      </div>
+
+      <div className="intent-box">
+        <span>意图说明</span>
+        <strong>{enemy.intent.label}</strong>
+        <small>{enemy.intent.description}</small>
       </div>
     </section>
   );

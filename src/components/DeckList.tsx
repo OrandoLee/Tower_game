@@ -16,7 +16,7 @@ export function DeckList({ deck }: DeckListProps) {
         {deck.map((card) => (
           <article className="deck-card" key={card.instanceId}>
             <strong>{card.name}</strong>
-            <span>{card.rarity}</span>
+            <span>{card.kind} / 费用 {card.cost}</span>
             <small>{card.description}</small>
           </article>
         ))}

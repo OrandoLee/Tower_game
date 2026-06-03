@@ -249,6 +249,32 @@ meter::-moz-meter-bar {
   background: #0b1017;
 }
 
+.intent-box {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #344254;
+  border-radius: 6px;
+  background: #0a0f16;
+}
+
+.intent-box span {
+  color: #8f9aaa;
+  font-size: 0.78rem;
+}
+
+.intent-box strong {
+  color: #eef4f8;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.intent-box small {
+  color: #a9b4c2;
+  line-height: 1.5;
+}
+
 .action-panel {
   position: sticky;
   top: 8px;

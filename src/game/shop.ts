@@ -1,4 +1,4 @@
-import { CARD_DEFINITIONS, MIN_DECK_SIZE, RELICS } from './constants';
+import { CARD_DEFINITIONS, MIN_DECK_SIZE, RELICS, STARTER_DECK_IDS } from './constants';
 import { applyRelic } from './rewards';
 import type { CardDefinition, GameState, Player, PlayerCard, ShopServiceId, ShopState } from './types';
 
@@ -18,9 +18,7 @@ export function createPlayerCard(card: CardDefinition): PlayerCard {
 }
 
 export function createStarterDeck(): PlayerCard[] {
-  const starterIds = ['strike', 'strike', 'strike', 'guard-step', 'guard-step'];
-
-  return starterIds.map((id) => {
+  return STARTER_DECK_IDS.map((id) => {
     const card = CARD_DEFINITIONS.find((item) => item.id === id);
     if (!card) {
       throw new Error(`缺少起始牌定义：${id}`);
@@ -45,7 +43,7 @@ export function generateShop(player: Player): ShopState {
   const relicOffers = shuffle(availableRelics)
     .slice(0, relicCount)
     .map((relic) => {
-      const strongRelic = ['rage-core', 'greedy-coin', 'spike-armor', 'crimson-heart'].includes(relic.id);
+      const strongRelic = ['rage-core', 'greedy-coin', 'spike-armor', 'crimson-heart', 'stabilizer', 'reactive-armor'].includes(relic.id);
 
       return {
         id: `relic-${relic.id}`,

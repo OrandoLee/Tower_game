@@ -96,7 +96,7 @@ export function ShopPanel({
 
             return (
               <article className="shop-card" key={offer.id}>
-                <span>{offer.card.rarity}</span>
+                <span>{offer.card.kind} / 费用 {offer.card.cost} / {offer.card.rarity}</span>
                 <strong>{offer.card.name}</strong>
                 <small>{offer.card.description}</small>
                 <button type="button" disabled={disabled} onClick={() => onBuyCard(offer.id)}>
