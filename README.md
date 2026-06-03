@@ -41,15 +41,24 @@ npm run build
 
 ## iframe 嵌入示例
 
+当前 GitHub Pages 部署地址：
+
+```text
+https://orandolee.github.io/Tower_game/
+```
+
+主站 LAB 页面可以使用下面的方式嵌入：
+
 ```html
 <iframe
-  src="https://你的部署地址"
-  style="width: 100%; min-height: 760px; border: 0;"
+  src="https://orandolee.github.io/Tower_game/"
+  title="数值高塔"
+  style="width: 100%; min-height: 760px; border: 0; display: block;"
   allow="fullscreen"
 ></iframe>
 ```
 
-页面自身提供完整背景和样式，不访问父页面 DOM，也不依赖主站 CSS 或字体。
+如果嵌入区域较窄，例如移动端或 900px 宽度的 LAB 卡片，页面会自动切换为适合触屏操作的布局。页面自身提供完整背景和样式，不访问父页面 DOM，也不依赖主站 CSS 或字体。
 
 ## 项目结构说明
 
