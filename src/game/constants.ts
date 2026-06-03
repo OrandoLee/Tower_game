@@ -1,7 +1,9 @@
-import type { Relic } from './types';
+import type { CardDefinition, Relic } from './types';
 
 export const MAX_FLOOR = 30;
 export const LOG_LIMIT = 8;
+export const SHOP_FLOORS = [4, 9, 14, 19, 24, 29];
+export const MIN_DECK_SIZE = 5;
 
 export const ENEMY_NAMES = [
   '游荡者',
@@ -58,6 +60,85 @@ export const RELICS: Relic[] = [
     description: '每次击杀后回复 15% 最大生命值。',
   },
 ];
+
+export const CARD_DEFINITIONS: CardDefinition[] = [
+  {
+    id: 'strike',
+    name: '打击',
+    description: '攻击时伤害增加 2。',
+    rarity: '基础',
+    attackBonus: 2,
+  },
+  {
+    id: 'guard-step',
+    name: '守势',
+    description: '防御时额外减少 2 点伤害。',
+    rarity: '基础',
+    guardBonus: 2,
+  },
+  {
+    id: 'heavy-hit',
+    name: '重击',
+    description: '攻击时伤害增加 8。',
+    rarity: '普通',
+    attackBonus: 8,
+  },
+  {
+    id: 'steady-cut',
+    name: '稳定斩击',
+    description: '攻击时暴击率增加 10%。',
+    rarity: '普通',
+    critRateBonus: 0.1,
+  },
+  {
+    id: 'blood-cut',
+    name: '回血刺',
+    description: '攻击时伤害增加 4，临时吸血增加 8%。',
+    rarity: '普通',
+    attackBonus: 4,
+    lifestealBonus: 0.08,
+  },
+  {
+    id: 'iron-guard',
+    name: '铁壁姿态',
+    description: '防御时额外减少 8 点伤害。',
+    rarity: '普通',
+    guardBonus: 8,
+  },
+  {
+    id: 'piercing-hit',
+    name: '贯穿重击',
+    description: '攻击时伤害增加 16。',
+    rarity: '强力',
+    attackBonus: 16,
+  },
+  {
+    id: 'focus-burst',
+    name: '集中爆发',
+    description: '攻击时暴击率增加 12%，暴击伤害增加 50%。',
+    rarity: '强力',
+    critRateBonus: 0.12,
+    critDamageBonus: 0.5,
+  },
+  {
+    id: 'blood-edge',
+    name: '血刃',
+    description: '攻击时伤害增加 8，临时吸血增加 15%。',
+    rarity: '强力',
+    attackBonus: 8,
+    lifestealBonus: 0.15,
+  },
+  {
+    id: 'alloy-wall',
+    name: '合金壁垒',
+    description: '防御时额外减少 14 点伤害，并回复 5 点生命值。',
+    rarity: '强力',
+    guardBonus: 14,
+    healOnGuard: 5,
+  },
+];
+
+export const STARTER_DECK_IDS = ['strike', 'strike', 'strike', 'guard-step', 'guard-step'];
 
 export const ENEMY_TYPE_LABELS = {
   normal: '普通',

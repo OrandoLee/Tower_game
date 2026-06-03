@@ -1,7 +1,7 @@
 import { RELICS } from './constants';
 import type { Player, Reward } from './types';
 
-type StatRewardTemplate = Omit<Reward, 'id'> & {
+type StatRewardTemplate = Omit<Reward, 'id' | 'goldAmount'> & {
   key: string;
 };
 
@@ -50,8 +50,8 @@ const STAT_REWARDS: StatRewardTemplate[] = [
   },
   {
     key: 'gold-plus',
-    title: '金币 +15',
-    description: '立即获得 15 金币。若拥有贪婪硬币，金币收益增加 50%。',
+    title: '金币',
+    description: '获得金币，用于之后的商店购买。',
     type: 'stat',
     rarity: '常规',
   },
@@ -68,7 +68,24 @@ function pickOne<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+function randomInt(min: number, max: number): number {
+  return Math.floor(min + Math.random() * (max - min + 1));
+}
+
 function createStatReward(template: StatRewardTemplate): Reward {
+  if (template.key === 'gold-plus') {
+    const goldAmount = randomInt(30, 45);
+
+    return {
+      id: `${template.key}-${goldAmount}`,
+      title: `金币 +${goldAmount}`,
+      description: `获得 ${goldAmount} 枚金币。可用于商店购买卡牌、遗物或服务。`,
+      type: template.type,
+      rarity: template.rarity,
+      goldAmount,
+    };
+  }
+
   return {
     id: template.key,
     title: template.title,
@@ -110,7 +127,7 @@ export function generateRewards(player: Player, enemyType: string): Reward[] {
     const stat = pickOne(STAT_REWARDS.filter((reward) => !usedIds.has(reward.key)));
     const reward = createStatReward(stat);
     choices.push(reward);
-    usedIds.add(reward.id);
+    usedIds.add(stat.key);
   }
 
   return choices;
@@ -128,6 +145,12 @@ export function applyReward(player: Player, reward: Reward): { player: Player; l
     const updated = applyRelic({ ...player, relics: [...player.relics, relic] }, relic.id);
     logs.push(`你获得了遗物：${relic.name}。`);
     return { player: updated, logs };
+  }
+
+  if (reward.id.startsWith('gold-plus')) {
+    const gained = reward.goldAmount ?? 35;
+    logs.push(`你获得了 ${gained} 枚金币。`);
+    return { player: { ...player, gold: player.gold + gained }, logs };
   }
 
   switch (reward.id) {
@@ -150,11 +173,6 @@ export function applyReward(player: Player, reward: Reward): { player: Player; l
       return { player: { ...player, critDamage: player.critDamage + 0.25 }, logs };
     case 'lifesteal-plus':
       return { player: { ...player, lifesteal: player.lifesteal + 0.05 }, logs };
-    case 'gold-plus': {
-      const gained = player.relics.some((relic) => relic.id === 'greedy-coin') ? 23 : 15;
-      logs.push(`你获得了 ${gained} 枚金币。`);
-      return { player: { ...player, gold: player.gold + gained }, logs };
-    }
     case 'heal': {
       const heal = Math.floor(player.maxHp * 0.2);
       logs.push(`你回复了 ${heal} 点生命值。`);

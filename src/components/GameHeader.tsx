@@ -6,6 +6,8 @@ interface GameHeaderProps {
 }
 
 export function GameHeader({ state }: GameHeaderProps) {
+  const currentType = state.phase === 'shop' ? '商店' : getEnemyTypeLabel(state.enemy.type);
+
   return (
     <header className="game-header panel">
       <div>
@@ -22,7 +24,7 @@ export function GameHeader({ state }: GameHeaderProps) {
         </div>
         <div>
           <span>敌人类型</span>
-          <strong>{getEnemyTypeLabel(state.enemy.type)}</strong>
+          <strong>{currentType}</strong>
         </div>
         <div>
           <span>历史最高层数</span>

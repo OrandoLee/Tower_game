@@ -30,6 +30,7 @@ export function PlayerPanel({ player, floor }: PlayerPanelProps) {
         <StatItem label="暴击伤害" value={formatPercent(player.critDamage)} />
         <StatItem label="吸血" value={formatPercent(player.lifesteal)} />
         <StatItem label="金币" value={player.gold} />
+        <StatItem label="牌组数量" value={`${player.deck.length} 张`} />
         <StatItem label="当前层数" value={`第 ${floor} 层`} />
       </div>
     </section>

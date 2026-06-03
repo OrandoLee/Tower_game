@@ -1,7 +1,8 @@
-import { ENEMY_NAMES, ENEMY_TYPE_LABELS, LOG_LIMIT, MAX_FLOOR } from './constants';
+import { ENEMY_NAMES, ENEMY_TYPE_LABELS, LOG_LIMIT, MAX_FLOOR, SHOP_FLOORS } from './constants';
 import { generateRewards } from './rewards';
+import { createStarterDeck, generateShop } from './shop';
 import { loadRecords, saveRecords } from './storage';
-import type { DamageResult, Enemy, EnemyType, GameState, Player, Records } from './types';
+import type { DamageResult, Enemy, EnemyType, GameState, Player, PlayerCard, Records } from './types';
 
 function randomBetween(min: number, max: number): number {
   return min + Math.random() * (max - min);
@@ -23,12 +24,20 @@ function enemyTypeLabel(type: EnemyType): string {
   return ENEMY_TYPE_LABELS[type];
 }
 
+function drawCard(player: Player): PlayerCard {
+  return player.deck[Math.floor(Math.random() * player.deck.length)];
+}
+
+function isShopFloor(floor: number): boolean {
+  return SHOP_FLOORS.includes(floor);
+}
+
 function getGoldReward(enemy: Enemy, player: Player): number {
   const base =
     enemy.type === 'normal'
-      ? 10 + enemy.floor
+      ? 8 + enemy.floor
       : enemy.type === 'elite'
-        ? 20 + enemy.floor * 2
+        ? 18 + enemy.floor * 2
         : 35 + enemy.floor * 3;
 
   return hasRelic(player, 'greedy-coin') ? Math.floor(base * 1.5) : base;
@@ -55,6 +64,7 @@ export function createInitialPlayer(): Player {
     lifesteal: 0,
     gold: 0,
     relics: [],
+    deck: createStarterDeck(),
   };
 }
 
@@ -101,26 +111,36 @@ export function createInitialGameState(records = loadRecords()): GameState {
     maxDamage: 0,
     logs: ['你进入了第 1 层。'],
     rewardChoices: [],
+    shop: null,
     phase: 'battle',
     records: updateRecords(records, 1, 0),
   };
 }
 
 export function calculatePlayerDamage(player: Player): DamageResult {
+  const card = drawCard(player);
   const lowHpRage = hasRelic(player, 'rage-core') && player.hp / player.maxHp < 0.3;
-  const effectiveAtk = lowHpRage ? player.atk * 1.5 : player.atk;
+  const effectiveAtk = (lowHpRage ? player.atk * 1.5 : player.atk) + (card.attackBonus ?? 0);
   let damage = Math.max(1, Math.floor(effectiveAtk * randomBetween(0.85, 1.15)));
-  const critical = Math.random() < player.critRate;
+  const critRate = player.critRate + (card.critRateBonus ?? 0);
+  const critDamage = player.critDamage + (card.critDamageBonus ?? 0);
+  const critical = Math.random() < critRate;
 
   if (critical) {
-    damage = Math.floor(damage * player.critDamage);
+    damage = Math.floor(damage * critDamage);
   }
 
-  return { damage, critical };
+  return {
+    damage,
+    critical,
+    card,
+    lifesteal: player.lifesteal + (card.lifestealBonus ?? 0),
+  };
 }
 
-export function calculateEnemyDamage(enemy: Enemy, player: Player, guarded = false): number {
-  const baseDamage = Math.max(1, Math.floor(enemy.atk - player.def));
+export function calculateEnemyDamage(enemy: Enemy, player: Player, guarded = false, card?: PlayerCard): number {
+  const cardGuard = guarded ? (card?.guardBonus ?? 0) : 0;
+  const baseDamage = Math.max(1, Math.floor(enemy.atk - player.def - cardGuard));
   return guarded ? Math.max(1, Math.floor(baseDamage * 0.5)) : baseDamage;
 }
 
@@ -128,13 +148,22 @@ export function applyEnemyAttack(
   player: Player,
   enemy: Enemy,
   guarded = false,
+  card?: PlayerCard,
 ): { player: Player; enemy: Enemy; logs: string[]; playerDefeated: boolean; enemyDefeated: boolean } {
-  const damage = calculateEnemyDamage(enemy, player, guarded);
-  const nextPlayer = {
+  const damage = calculateEnemyDamage(enemy, player, guarded, card);
+  let nextPlayer = {
     ...player,
     hp: clampHp(player.hp - damage, player.maxHp),
   };
   const logs = [`敌人造成了 ${damage} 点伤害。`];
+
+  if (guarded && card?.healOnGuard) {
+    nextPlayer = {
+      ...nextPlayer,
+      hp: Math.min(nextPlayer.maxHp, nextPlayer.hp + card.healOnGuard),
+    };
+    logs.push(`${card.name} 回复了 ${card.healOnGuard} 点生命值。`);
+  }
 
   if (hasRelic(player, 'spike-armor')) {
     const reflected = player.def * 2;
@@ -187,6 +216,7 @@ export function handleVictory(state: GameState, player: Player, enemy: Enemy, lo
       kills,
       logs: addLogs(state.logs, [...killLogs, '最终首领倒下了。']),
       rewardChoices: [],
+      shop: null,
       phase: 'cleared',
       records,
     };
@@ -200,6 +230,7 @@ export function handleVictory(state: GameState, player: Player, enemy: Enemy, lo
     kills,
     logs: addLogs(state.logs, [...killLogs, '选择一项奖励继续前进。']),
     rewardChoices: generateRewards(nextPlayer, enemy.type),
+    shop: null,
     phase: 'reward',
     records,
   };
@@ -216,14 +247,14 @@ export function playerAttack(state: GameState): GameState {
     hp: clampHp(state.enemy.hp - result.damage, state.enemy.maxHp),
   };
   const maxDamage = Math.max(state.maxDamage, result.damage);
-  const attackLogs = [`你造成了 ${result.damage} 点伤害。`];
+  const attackLogs = [`你抽到了卡牌：${result.card.name}。`, `你造成了 ${result.damage} 点伤害。`];
 
   if (result.critical) {
     attackLogs.push('暴击。');
   }
 
   let player = state.player;
-  const heal = Math.floor(result.damage * player.lifesteal);
+  const heal = Math.floor(result.damage * result.lifesteal);
   if (heal > 0) {
     player = { ...player, hp: Math.min(player.maxHp, player.hp + heal) };
     attackLogs.push(`你回复了 ${heal} 点生命值。`);
@@ -269,8 +300,9 @@ export function playerGuard(state: GameState): GameState {
     return state;
   }
 
-  const counter = applyEnemyAttack(state.player, state.enemy, true);
-  const logs = ['你进入防御姿态。', ...counter.logs];
+  const card = drawCard(state.player);
+  const counter = applyEnemyAttack(state.player, state.enemy, true, card);
+  const logs = [`你抽到了卡牌：${card.name}。`, '你进入防御姿态。', ...counter.logs];
 
   if (counter.enemyDefeated) {
     return handleVictory(state, counter.player, counter.enemy, logs);
@@ -300,6 +332,19 @@ export function nextFloor(state: GameState, player: Player, rewardLogs: string[]
   const next = state.floor + 1;
   const records = updateRecords(state.records, next, state.maxDamage);
 
+  if (isShopFloor(next)) {
+    return {
+      ...state,
+      player,
+      floor: next,
+      logs: addLogs(state.logs, [...rewardLogs, `你进入了第 ${next} 层商店。`]),
+      rewardChoices: [],
+      shop: generateShop(player),
+      phase: 'shop',
+      records,
+    };
+  }
+
   return {
     ...state,
     player,
@@ -307,6 +352,26 @@ export function nextFloor(state: GameState, player: Player, rewardLogs: string[]
     floor: next,
     logs: addLogs(state.logs, [...rewardLogs, `你进入了第 ${next} 层。`]),
     rewardChoices: [],
+    shop: null,
+    phase: 'battle',
+    records,
+  };
+}
+
+export function leaveShop(state: GameState): GameState {
+  if (state.phase !== 'shop') {
+    return state;
+  }
+
+  const next = state.floor + 1;
+  const records = updateRecords(state.records, next, state.maxDamage);
+
+  return {
+    ...state,
+    enemy: generateEnemy(next),
+    floor: next,
+    logs: addLogs(state.logs, [`你离开商店，进入了第 ${next} 层。`]),
+    shop: null,
     phase: 'battle',
     records,
   };

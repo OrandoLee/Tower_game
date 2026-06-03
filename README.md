@@ -1,6 +1,6 @@
 # 数值高塔
 
-数值高塔是一个独立前端小游戏项目。玩家从第 1 层开始，通过攻击、防御、选择奖励和积累遗物，在 30 层高塔中形成自己的构筑，最终挑战第 30 层最终首领。
+数值高塔是一个独立前端小游戏项目。玩家从第 1 层开始，通过攻击、防御、选择奖励、积累遗物和经营金币，在 30 层高塔中形成自己的构筑，最终挑战第 30 层最终首领。
 
 项目不依赖主站、不需要后端、不需要数据库，可以独立访问，也适合被主站 LAB 板块通过 iframe 嵌入展示。
 
@@ -73,18 +73,21 @@ src/
     format.ts
     logic.ts
     rewards.ts
+    shop.ts
     storage.ts
     types.ts
   components/
     ActionPanel.tsx
     BattleLog.tsx
+    DeckList.tsx
     EnemyPanel.tsx
     GameHeader.tsx
     PlayerPanel.tsx
     RelicList.tsx
     ResultPanel.tsx
     RewardChoices.tsx
+    ShopPanel.tsx
     StatItem.tsx
 ```
 
-核心游戏逻辑位于 `src/game/logic.ts` 和 `src/game/rewards.ts`。页面组件位于 `src/components/`，负责展示中文界面、响应攻击、防御、奖励选择和重新开始操作。
+核心游戏逻辑位于 `src/game/logic.ts`、`src/game/rewards.ts` 和 `src/game/shop.ts`。页面组件位于 `src/components/`，负责展示中文界面、响应攻击、防御、奖励选择、商店购买、删牌和重新开始操作。

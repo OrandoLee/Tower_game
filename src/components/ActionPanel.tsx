@@ -14,7 +14,7 @@ export function ActionPanel({ phase, onAttack, onGuard, onRestart }: ActionPanel
     <section className="panel action-panel">
       <div className="panel-title">
         <p>操作区</p>
-        <span>{canAct ? '战斗中' : phase === 'reward' ? '选择奖励' : '结算'}</span>
+        <span>{canAct ? '战斗中' : phase === 'reward' ? '选择奖励' : phase === 'shop' ? '商店' : '结算'}</span>
       </div>
 
       <div className="action-buttons">

@@ -137,6 +137,11 @@ h1 {
   min-width: 0;
 }
 
+.relic-area {
+  display: grid;
+  gap: 12px;
+}
+
 .panel:not(.game-header) {
   padding: 14px;
 }
@@ -258,7 +263,10 @@ meter::-moz-meter-bar {
 
 .action-buttons button,
 .reward-card,
-.result-restart {
+.result-restart,
+.shop-card button,
+.shop-leave-button,
+.remove-card-grid button {
   min-height: 46px;
   border: 1px solid #344254;
   border-radius: 6px;
@@ -273,13 +281,17 @@ meter::-moz-meter-bar {
 
 .action-buttons button:hover:not(:disabled),
 .reward-card:hover,
-.result-restart:hover {
+.result-restart:hover,
+.shop-card button:hover:not(:disabled),
+.shop-leave-button:hover,
+.remove-card-grid button:hover {
   border-color: #7f98b8;
   background: #182331;
   transform: translateY(-1px);
 }
 
-.action-buttons button:disabled {
+.action-buttons button:disabled,
+.shop-card button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
@@ -349,6 +361,41 @@ meter::-moz-meter-bar {
   gap: 8px;
 }
 
+.deck-list {
+  display: grid;
+  gap: 8px;
+}
+
+.deck-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #212a35;
+  border-radius: 6px;
+  background: #0b1017;
+}
+
+.deck-card strong {
+  min-width: 0;
+  color: #edf3f8;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.deck-card span {
+  color: #8f9aaa;
+  font-size: 0.78rem;
+}
+
+.deck-card small {
+  grid-column: 1 / -1;
+  color: #9aa6b5;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .relic-item {
   display: grid;
   gap: 4px;
@@ -389,6 +436,103 @@ meter::-moz-meter-bar {
   margin-top: 12px;
 }
 
+.shop-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.shop-section {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.shop-section h2 {
+  margin: 0;
+  color: #dce5ee;
+  font-size: 0.95rem;
+}
+
+.shop-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.shop-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  min-height: 148px;
+  padding: 12px;
+  border: 1px solid #212a35;
+  border-radius: 6px;
+  background: #0b1017;
+}
+
+.shop-card span {
+  color: #8f9aaa;
+  font-size: 0.78rem;
+}
+
+.shop-card strong {
+  color: #eef4f8;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.shop-card small {
+  color: #a9b4c2;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.shop-card button,
+.shop-leave-button {
+  width: 100%;
+  margin-top: auto;
+}
+
+.shop-leave-button {
+  min-height: 48px;
+}
+
+.remove-card-box {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #364252;
+  border-radius: 6px;
+  background: #090d13;
+}
+
+.inline-title {
+  margin-bottom: 0;
+}
+
+.remove-card-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.remove-card-grid button {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-height: 58px;
+  padding: 10px;
+  text-align: left;
+}
+
+.remove-card-grid strong {
+  color: #edf4fb;
+  overflow-wrap: anywhere;
+}
+
+.remove-card-grid small {
+  color: #9aa6b5;
+  line-height: 1.45;
+}
+
 @media (min-width: 768px) {
   .app-shell {
     padding: 22px;
@@ -424,6 +568,10 @@ meter::-moz-meter-bar {
 
   .reward-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .shop-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -503,7 +651,10 @@ meter::-moz-meter-bar {
   }
 
   .action-buttons button,
-  .result-restart {
+  .result-restart,
+  .shop-card button,
+  .shop-leave-button,
+  .remove-card-grid button {
     min-height: 48px;
   }
 }

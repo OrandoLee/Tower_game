@@ -1,10 +1,14 @@
 export type EnemyType = 'normal' | 'elite' | 'boss' | 'finalBoss';
 
-export type GamePhase = 'battle' | 'reward' | 'defeated' | 'cleared';
+export type GamePhase = 'battle' | 'reward' | 'shop' | 'defeated' | 'cleared';
 
 export type RewardType = 'stat' | 'relic';
 
 export type RewardRarity = '常规' | '稀有';
+
+export type CardRarity = '基础' | '普通' | '强力';
+
+export type ShopServiceId = 'remove-card' | 'heal' | 'max-hp';
 
 export interface Relic {
   id: string;
@@ -22,6 +26,7 @@ export interface Player {
   lifesteal: number;
   gold: number;
   relics: Relic[];
+  deck: PlayerCard[];
 }
 
 export interface Enemy {
@@ -40,6 +45,43 @@ export interface Reward {
   type: RewardType;
   rarity: RewardRarity;
   relicId?: string;
+  goldAmount?: number;
+}
+
+export interface CardDefinition {
+  id: string;
+  name: string;
+  description: string;
+  rarity: CardRarity;
+  attackBonus?: number;
+  guardBonus?: number;
+  critRateBonus?: number;
+  critDamageBonus?: number;
+  lifestealBonus?: number;
+  healOnGuard?: number;
+}
+
+export interface PlayerCard extends CardDefinition {
+  instanceId: string;
+}
+
+export interface ShopCardOffer {
+  id: string;
+  card: CardDefinition;
+  price: number;
+}
+
+export interface ShopRelicOffer {
+  id: string;
+  relic: Relic;
+  price: number;
+}
+
+export interface ShopState {
+  cardOffers: ShopCardOffer[];
+  relicOffers: ShopRelicOffer[];
+  purchasedIds: string[];
+  removingCard: boolean;
 }
 
 export interface Records {
@@ -56,6 +98,7 @@ export interface GameState {
   maxDamage: number;
   logs: string[];
   rewardChoices: Reward[];
+  shop: ShopState | null;
   phase: GamePhase;
   records: Records;
 }
@@ -63,4 +106,6 @@ export interface GameState {
 export interface DamageResult {
   damage: number;
   critical: boolean;
+  card: PlayerCard;
+  lifesteal: number;
 }

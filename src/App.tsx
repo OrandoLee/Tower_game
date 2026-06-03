@@ -7,14 +7,23 @@ import { PlayerPanel } from './components/PlayerPanel';
 import { RelicList } from './components/RelicList';
 import { ResultPanel } from './components/ResultPanel';
 import { RewardChoices } from './components/RewardChoices';
+import { DeckList } from './components/DeckList';
+import { ShopPanel } from './components/ShopPanel';
 import { applyReward } from './game/rewards';
-import { createInitialGameState, nextFloor, playerAttack, playerGuard, restartGame } from './game/logic';
-import type { GameState, Reward } from './game/types';
+import { createInitialGameState, leaveShop, nextFloor, playerAttack, playerGuard, restartGame } from './game/logic';
+import { buyShopCard, buyShopRelic, buyShopService, cancelRemoveCard, removeShopCard } from './game/shop';
+import type { GameState, Reward, ShopServiceId } from './game/types';
 
 type Action =
   | { type: 'attack' }
   | { type: 'guard' }
   | { type: 'chooseReward'; reward: Reward }
+  | { type: 'buyCard'; offerId: string }
+  | { type: 'buyRelic'; offerId: string }
+  | { type: 'buyService'; serviceId: ShopServiceId }
+  | { type: 'removeCard'; instanceId: string }
+  | { type: 'cancelRemoveCard' }
+  | { type: 'leaveShop' }
   | { type: 'restart' };
 
 function reducer(state: GameState, action: Action): GameState {
@@ -31,6 +40,18 @@ function reducer(state: GameState, action: Action): GameState {
       const result = applyReward(state.player, action.reward);
       return nextFloor(state, result.player, result.logs);
     }
+    case 'buyCard':
+      return buyShopCard(state, action.offerId);
+    case 'buyRelic':
+      return buyShopRelic(state, action.offerId);
+    case 'buyService':
+      return buyShopService(state, action.serviceId);
+    case 'removeCard':
+      return removeShopCard(state, action.instanceId);
+    case 'cancelRemoveCard':
+      return cancelRemoveCard(state);
+    case 'leaveShop':
+      return leaveShop(state);
     case 'restart':
       return restartGame(state.records);
     default:
@@ -47,7 +68,20 @@ function App() {
 
       <div className="game-layout">
         <div className="enemy-area">
-          <EnemyPanel enemy={state.enemy} />
+          {state.phase === 'shop' ? (
+            <ShopPanel
+              player={state.player}
+              shop={state.shop}
+              onBuyCard={(offerId) => dispatch({ type: 'buyCard', offerId })}
+              onBuyRelic={(offerId) => dispatch({ type: 'buyRelic', offerId })}
+              onBuyService={(serviceId) => dispatch({ type: 'buyService', serviceId })}
+              onRemoveCard={(instanceId) => dispatch({ type: 'removeCard', instanceId })}
+              onCancelRemoveCard={() => dispatch({ type: 'cancelRemoveCard' })}
+              onLeave={() => dispatch({ type: 'leaveShop' })}
+            />
+          ) : (
+            <EnemyPanel enemy={state.enemy} />
+          )}
         </div>
 
         <div className="player-area">
@@ -80,6 +114,7 @@ function App() {
         </div>
 
         <div className="relic-area">
+          <DeckList deck={state.player.deck} />
           <RelicList relics={state.player.relics} />
         </div>
       </div>
