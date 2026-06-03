@@ -275,19 +275,182 @@ meter::-moz-meter-bar {
   line-height: 1.5;
 }
 
-.action-panel {
+.action-hand {
   position: sticky;
   top: 8px;
   z-index: 2;
+  overflow: visible;
 }
 
-.action-buttons {
+.action-hand-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.action-hand-header p {
+  margin: 0;
+  color: #f0f5fa;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.action-hand-header span {
+  display: block;
+  margin-top: 3px;
+  color: #8f9aaa;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.hand-restart-button {
+  min-height: 34px;
+  border: 1px solid #2b3543;
+  border-radius: 6px;
+  background: transparent;
+  color: #aeb9c6;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background 140ms ease;
+}
+
+.hand-restart-button:hover {
+  border-color: #65768c;
+  background: #101720;
+  color: #edf4fb;
+}
+
+.hand-stage {
+  min-width: 0;
+  overflow: visible;
+  padding: 10px 4px 0;
+  border-top: 1px solid #1d2630;
+}
+
+.hand-card-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 222px;
+  overflow: visible;
+  padding: 18px 18px 0;
+}
+
+.action-card {
+  --card-offset: 0;
+  position: relative;
+  z-index: 10;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto 1fr auto;
   gap: 8px;
+  width: clamp(142px, 34vw, 168px);
+  min-height: 204px;
+  margin-left: -18px;
+  padding: 12px;
+  border: 1px solid #344254;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 34%),
+    #101721;
+  color: #edf4fb;
+  cursor: pointer;
+  text-align: left;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 14px 26px rgba(0, 0, 0, 0.24);
+  transform: translateY(0) rotate(calc(var(--card-offset) * 3deg));
+  transform-origin: 50% 100%;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease,
+    transform 150ms ease;
 }
 
-.action-buttons button,
+.action-card:first-child {
+  margin-left: 0;
+}
+
+.action-card:hover:not(:disabled),
+.action-card:focus-visible:not(:disabled) {
+  z-index: 30;
+  border-color: #8798ad;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 20px 34px rgba(0, 0, 0, 0.34);
+  transform: translateY(-14px) rotate(calc(var(--card-offset) * 1.5deg));
+}
+
+.action-card:active:not(:disabled),
+.action-card-played {
+  transform: translateY(-8px) scale(0.985) rotate(calc(var(--card-offset) * 1.5deg));
+}
+
+.action-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.action-card-attack {
+  border-top-color: #7f918f;
+}
+
+.action-card-guard {
+  border-top-color: #7b879f;
+}
+
+.action-card-cost {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #4a596c;
+  border-radius: 50%;
+  background: #080d13;
+  color: #f3f7fb;
+  font-size: 0.95rem;
+  font-weight: 750;
+}
+
+.action-card-type {
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px 7px;
+  border: 1px solid #26313d;
+  border-radius: 999px;
+  color: #97a5b6;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.action-card strong {
+  align-self: end;
+  color: #f2f7fb;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.action-card small {
+  color: #b8c2ce;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.action-card em {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #25303c;
+  color: #8f9aaa;
+  font-size: 0.76rem;
+  font-style: normal;
+}
+
 .reward-card,
 .result-restart,
 .shop-card button,
@@ -305,7 +468,6 @@ meter::-moz-meter-bar {
     transform 140ms ease;
 }
 
-.action-buttons button:hover:not(:disabled),
 .reward-card:hover,
 .result-restart:hover,
 .shop-card button:hover:not(:disabled),
@@ -316,7 +478,6 @@ meter::-moz-meter-bar {
   transform: translateY(-1px);
 }
 
-.action-buttons button:disabled,
 .shop-card button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
@@ -606,9 +767,9 @@ meter::-moz-meter-bar {
     grid-template-columns: minmax(230px, 0.8fr) minmax(360px, 1.2fr) minmax(240px, 0.9fr);
     grid-template-areas:
       "player enemy log"
-      "relic action log"
       "relic reward log"
-      "relic result log";
+      "relic result log"
+      "relic action log";
     align-items: start;
   }
 
@@ -617,7 +778,7 @@ meter::-moz-meter-bar {
     top: 16px;
   }
 
-  .action-panel {
+  .action-hand {
     position: static;
   }
 }
@@ -672,15 +833,31 @@ meter::-moz-meter-bar {
     grid-template-columns: 1fr;
   }
 
-  .action-buttons {
-    grid-template-columns: 1fr;
-  }
-
-  .action-buttons button,
   .result-restart,
   .shop-card button,
   .shop-leave-button,
   .remove-card-grid button {
     min-height: 48px;
+  }
+
+  .hand-stage {
+    padding-top: 6px;
+  }
+
+  .hand-card-row {
+    min-height: 196px;
+    padding-inline: 10px;
+  }
+
+  .action-card {
+    width: clamp(132px, 43vw, 150px);
+    min-height: 184px;
+    margin-left: -10px;
+    transform: translateY(0) rotate(calc(var(--card-offset) * 1.25deg));
+  }
+
+  .action-card:hover:not(:disabled),
+  .action-card:focus-visible:not(:disabled) {
+    transform: translateY(-8px) rotate(calc(var(--card-offset) * 0.75deg));
   }
 }

@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import { ActionPanel } from './components/ActionPanel';
+import { ActionHand } from './components/ActionHand';
 import { BattleLog } from './components/BattleLog';
 import { EnemyPanel } from './components/EnemyPanel';
 import { GameHeader } from './components/GameHeader';
@@ -89,7 +89,7 @@ function App() {
         </div>
 
         <div className="action-area">
-          <ActionPanel
+          <ActionHand
             phase={state.phase}
             onAttack={() => dispatch({ type: 'attack' })}
             onGuard={() => dispatch({ type: 'guard' })}
