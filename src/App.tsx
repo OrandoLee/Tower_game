@@ -10,6 +10,7 @@ import { ResultPanel } from './components/ResultPanel';
 import { RewardChoices } from './components/RewardChoices';
 import { DeckList } from './components/DeckList';
 import { ShopPanel } from './components/ShopPanel';
+import { StartMenu } from './components/StartMenu';
 import { applyReward } from './game/rewards';
 import { createInitialGameState, leaveShop, nextFloor, playerAttack, playerGuard, restartGame } from './game/logic';
 import { buyShopCard, buyShopRelic, buyShopService, cancelRemoveCard, removeShopCard } from './game/shop';
@@ -64,6 +65,7 @@ function reducer(state: GameState, action: Action): GameState {
 
 function App() {
   const [state, dispatch] = useReducer(reducer, undefined, () => createInitialGameState());
+  const [hasStarted, setHasStarted] = useState(false);
   const [selectedCard, setSelectedCard] = useState<ActionCardData | null>(null);
   const [playedCardId, setPlayedCardId] = useState<string | null>(null);
   const [invalidTarget, setInvalidTarget] = useState<ActionTargetType | null>(null);
@@ -191,6 +193,15 @@ function App() {
     setInvalidTarget(null);
     setInteractionMessage('');
     dispatch({ type: 'guard' });
+  }
+
+  function handleStart() {
+    dispatch({ type: 'restart' });
+    setHasStarted(true);
+  }
+
+  if (!hasStarted) {
+    return <StartMenu records={state.records} onStart={handleStart} />;
   }
 
   return (
