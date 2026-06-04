@@ -46,7 +46,7 @@ export function StartMenu({ records, onStart }: StartMenuProps) {
             <span>NUMERIC</span>
             <span>TOWER</span>
           </h1>
-          <p className="start-menu-lab">LAB-02</p>
+          <p className="start-menu-lab">LAB-00</p>
           <p className="start-menu-subtitle">数值高塔构筑实验</p>
         </header>
 

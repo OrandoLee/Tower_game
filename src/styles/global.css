@@ -157,11 +157,12 @@ button {
   display: grid;
   margin: 0;
   color: #f4f5f7;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", "Microsoft YaHei", sans-serif;
+  font-family: "Arial Narrow", "Bahnschrift Condensed", "Roboto Condensed", Arial, "Microsoft YaHei", sans-serif;
   font-size: clamp(5.2rem, 10.7vw, 11rem);
-  font-weight: 900;
-  letter-spacing: -0.055em;
-  line-height: 0.72;
+  font-stretch: condensed;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.78;
   text-transform: uppercase;
 }
 
