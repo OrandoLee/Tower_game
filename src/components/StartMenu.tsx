@@ -39,7 +39,7 @@ export function StartMenu({ records, onStart }: StartMenuProps) {
       <section className="start-menu-content">
         <header className="start-menu-heading">
           <p className="start-menu-kicker">
-            <span>ORANDO LAB</span>
+            <span>DELEE LAB</span>
             <span>呈现</span>
           </p>
           <h1 className="start-menu-title">
