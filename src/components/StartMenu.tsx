@@ -2,6 +2,7 @@ import type { Records } from '../game/types';
 
 interface StartMenuProps {
   records: Records;
+  exiting?: boolean;
   onStart: () => void;
 }
 
@@ -16,9 +17,9 @@ const GRID_TILES = [
   { x: 5, y: 7, delay: '-0.9s' },
 ];
 
-export function StartMenu({ records, onStart }: StartMenuProps) {
+export function StartMenu({ records, exiting = false, onStart }: StartMenuProps) {
   return (
-    <main className="start-menu">
+    <main className={`start-menu${exiting ? ' start-menu-exiting' : ''}`}>
       <div className="start-menu-glow" aria-hidden="true" />
       <div className="start-grid" aria-hidden="true">
         {GRID_TILES.map((tile, index) => (

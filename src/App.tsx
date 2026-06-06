@@ -15,6 +15,7 @@ import { applyReward } from './game/rewards';
 import { createInitialGameState, leaveShop, nextFloor, playerAttack, playerGuard, restartGame } from './game/logic';
 import { buyShopCard, buyShopRelic, buyShopService, cancelRemoveCard, removeShopCard } from './game/shop';
 import type { GameState, Reward, ShopServiceId } from './game/types';
+import labLogoUrl from './assets/lab.svg';
 
 type InfoTab = 'log' | 'relics' | 'deck';
 
@@ -63,9 +64,23 @@ function reducer(state: GameState, action: Action): GameState {
   }
 }
 
+function LaunchIntro({ visible }: { visible: boolean }) {
+  if (!visible) {
+    return null;
+  }
+
+  return (
+    <div className="launch-intro" aria-hidden="true">
+      <img src={labLogoUrl} alt="" />
+    </div>
+  );
+}
+
 function App() {
   const [state, dispatch] = useReducer(reducer, undefined, () => createInitialGameState());
+  const [launchIntroVisible, setLaunchIntroVisible] = useState(true);
   const [hasStarted, setHasStarted] = useState(false);
+  const [startMenuExiting, setStartMenuExiting] = useState(false);
   const [selectedCard, setSelectedCard] = useState<ActionCardData | null>(null);
   const [playedCardId, setPlayedCardId] = useState<string | null>(null);
   const [invalidTarget, setInvalidTarget] = useState<ActionTargetType | null>(null);
@@ -73,6 +88,12 @@ function App() {
   const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>('log');
 
   const canPlayCard = state.phase === 'battle';
+  const gameSceneKey = state.phase === 'battle' ? `battle-${state.floor}` : state.phase;
+
+  useEffect(() => {
+    const introTimer = window.setTimeout(() => setLaunchIntroVisible(false), 1500);
+    return () => window.clearTimeout(introTimer);
+  }, []);
 
   useEffect(() => {
     if (!canPlayCard) {
@@ -196,21 +217,36 @@ function App() {
   }
 
   function handleStart() {
-    dispatch({ type: 'restart' });
-    setHasStarted(true);
+    if (startMenuExiting) {
+      return;
+    }
+
+    setStartMenuExiting(true);
+    window.setTimeout(() => {
+      dispatch({ type: 'restart' });
+      setHasStarted(true);
+      setStartMenuExiting(false);
+    }, 420);
   }
 
   if (!hasStarted) {
-    return <StartMenu records={state.records} onStart={handleStart} />;
+    return (
+      <>
+        <LaunchIntro visible={launchIntroVisible} />
+        <StartMenu records={state.records} exiting={startMenuExiting} onStart={handleStart} />
+      </>
+    );
   }
 
   return (
-    <main className="app-shell" onClick={handleBlankCancel}>
+    <>
+      <LaunchIntro visible={launchIntroVisible} />
+      <main className="app-shell app-shell-enter" onClick={handleBlankCancel}>
       <GameHeader state={state} />
 
       <div className="game-layout">
         <div className="combat-area">
-          <div className="enemy-area">
+          <div className="enemy-area view-transition" key={`enemy-${gameSceneKey}`}>
             {state.phase === 'shop' ? (
               <ShopPanel
                 player={state.player}
@@ -233,7 +269,7 @@ function App() {
           </div>
 
           {state.phase === 'reward' ? (
-            <div className="reward-area">
+            <div className="reward-area view-transition" key={`reward-${gameSceneKey}`}>
               <RewardChoices
                 rewards={state.rewardChoices}
                 visible={state.phase === 'reward'}
@@ -241,7 +277,7 @@ function App() {
               />
             </div>
           ) : (
-            <div className="action-area">
+            <div className="action-area view-transition" key={`action-${gameSceneKey}`}>
               <ActionHand
                 phase={state.phase}
                 selectedCardId={selectedCard?.id ?? null}
@@ -253,7 +289,7 @@ function App() {
           )}
         </div>
 
-        <div className="player-area">
+        <div className="player-area view-transition" key={`player-${gameSceneKey}`}>
           <PlayerPanel
             player={state.player}
             floor={state.floor}
@@ -275,7 +311,7 @@ function App() {
           </section>
         </div>
 
-        <div className="result-area">
+        <div className="result-area view-transition" key={`result-${gameSceneKey}`}>
           <ResultPanel state={state} onRestart={() => dispatch({ type: 'restart' })} />
         </div>
 
@@ -311,7 +347,7 @@ function App() {
               </button>
             </div>
 
-            <div className="info-tab-panel">
+            <div className="info-tab-panel view-transition" key={activeInfoTab}>
               {activeInfoTab === 'log' && <BattleLog logs={state.logs} embedded />}
               {activeInfoTab === 'relics' && <RelicList relics={state.player.relics} embedded />}
               {activeInfoTab === 'deck' && <DeckList deck={state.player.deck} embedded />}
@@ -319,7 +355,8 @@ function App() {
           </section>
         </div>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
 
