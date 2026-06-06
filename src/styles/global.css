@@ -50,8 +50,8 @@ button {
 }
 
 .launch-intro img {
-  width: min(54vw, 360px);
-  max-height: 46vh;
+  width: min(76vw, 640px);
+  max-height: 62vh;
   object-fit: contain;
   filter: invert(1) drop-shadow(0 0 24px rgba(148, 176, 208, 0.28));
   opacity: 0;
